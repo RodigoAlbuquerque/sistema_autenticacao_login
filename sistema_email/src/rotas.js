@@ -1,28 +1,39 @@
 import React,{useState} from "react";
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import SignIn from './Pages/SignIn/SignIn';
 import SignUp from './Pages/SignUp/SignUp';
 import Logado from './Pages/Logado/Logado';
-import UserContext from './components/ValidationContext';
+
+import { PrivateRoute } from "./Pages/privateRoute/privateRoute";
+import { ValidationContext } from './components/ValidationContext';
+import { ValidateAccount } from "./components/ValidateAccount";
+import { usuarioContext } from "./components/usuarioContext"
 
 export default function Rotas(){
-    const [cadastrados,setCadastrados] = useState(
-    [
-        {login:"roro.costa2018@gmail.com",senha:"1234567890",user:"Rodrigo Albuquerque"},
-        {login:"rafa.costa2018@gmail.com",senha:"0987654321",user:"Rafael Albuquerque"}
-    ]
-    );
+
+    let [cadastrados,setCadastrados] = useState(localStorage.getItem('cadastros')?JSON.parse(localStorage.getItem('cadastros')):[]);
+    let [liberado, setLiberado] = useState(false)
+    let [usuario , setUsuario] = useState("")
     return(
         <BrowserRouter>
-            <UserContext.Provider value={ { cadastrados, setCadastrados } }>
-                <Routes>
-                    <Route path='/' element={<SignIn/>}/>
-                    <Route path='/signup' element={<SignUp/>}/>
-                    <Route path='/logado' element={<Logado/>}/>
-                </Routes>
-            </UserContext.Provider>
+            <ValidationContext.Provider value={ { cadastrados, setCadastrados } }>
+                <ValidateAccount.Provider value = { { liberado , setLiberado } }>
+                    <usuarioContext.Provider value= { {usuario, setUsuario} }>
+                        <Routes>
+                            <Route path='/' element={<SignIn />}/>
+                            <Route path='/signup' element={<SignUp/>}/>
+                            <Route 
+                                path="/logado"
+                                element={
+                                    <PrivateRoute>
+                                        <Logado />
+                                    </PrivateRoute>
+                            }/>
+                        </Routes>
+                    </usuarioContext.Provider>
+                </ValidateAccount.Provider>
+            </ValidationContext.Provider>
         </BrowserRouter>  
     );
 }

@@ -1,8 +1,7 @@
-import React from "react";
 import { createContext } from "react";
 
-const UserContext = createContext({});
-export default UserContext 
+export const ValidationContext = createContext(null);
+ 
 
 
 
